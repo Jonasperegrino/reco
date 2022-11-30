@@ -3,7 +3,10 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 import pandas as pd
 import datetime
+from PIL import Image
 
+man_img = Image.open("manual.jpeg")
+ai_img = Image.open("ai.jpeg")
 
 def check_password():
     """Returns `True` if the user had the correct password."""
@@ -69,6 +72,7 @@ def get_data(site, start, end):
     return df
 
 if check_password():
+    st.snow()
     site = "mps"
     start = "2022-11-28"  # @param {type: "date", min:1, max:90}
     end = "2022-12-31"  # @param {type:"date"}
@@ -80,5 +84,10 @@ if check_password():
     df.dropna(subset=["site"], inplace=True)
     st.title("Kaufbasierte Recos")
     st.write("Zeitraum: ", start, " - ", end)
-    st.write("Mainpost Manual", df[df.site.str.contains("artDetailManual")].shape[0])
-    st.write("Mainpost API", df[df.site.str.contains("artDetailApi")].shape[0])
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(man_img, use_column_width="auto")
+        st.metric("Käufe bei manueller Ausspielung", df[df.site.str.contains("artDetailManual")].shape[0])
+    with col2:
+        st.image(ai_img, use_column_width="auto")
+        st.metric("Käufe bei automatischer Ausspielung", df[df.site.str.contains("artDetailApi")].shape[0])
