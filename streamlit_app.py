@@ -8,6 +8,7 @@ from PIL import Image
 man_img = Image.open("manual.jpeg")
 ai_img = Image.open("ai.jpeg")
 
+
 def check_password():
     """Returns `True` if the user had the correct password."""
 
@@ -36,16 +37,6 @@ def check_password():
         # Password correct.
         return True
 
-def plusOnly(df, Verlag):
-    plus = {
-        "aba": "A_PLUS_WEB",
-        "mps": "SNWN_2001PWB1",
-        "skr": "SKPK037_N",
-        "wtc": "K_KO_PP_M1",
-    }
-    df = df[df.term_id == plus[Verlag]]
-    return df
-
 
 def get_data(site, start, end):
     dynamodb = boto3.resource(
@@ -71,6 +62,7 @@ def get_data(site, start, end):
     df.price = df.price.astype(float)
     return df
 
+
 if check_password():
     st.snow()
     site = "mps"
@@ -79,7 +71,9 @@ if check_password():
     ACCESS_KEY = st.secrets["ACCESS_KEY"]
     SECRET_KEY = st.secrets["SECRET_KEY"]
     start = datetime.datetime.strptime(start, "%Y-%m-%d")
-    end = datetime.datetime.strptime(end, "%Y-%m-%d").replace(hour=23, minute=59, second=59)
+    end = datetime.datetime.strptime(end, "%Y-%m-%d").replace(
+        hour=23, minute=59, second=59
+    )
     df = get_data(site, start, end)
     df.dropna(subset=["site"], inplace=True)
     st.title("Kaufbasierte Recos")
@@ -87,7 +81,13 @@ if check_password():
     col1, col2 = st.columns(2)
     with col1:
         st.image(man_img, use_column_width="auto")
-        st.metric("Käufe bei manueller Ausspielung", df[df.site.str.contains("artDetailManual")].shape[0])
+        st.metric(
+            "Käufe bei manueller Ausspielung",
+            df[df.site.str.contains("artDetailManual")].shape[0],
+        )
     with col2:
         st.image(ai_img, use_column_width="auto")
-        st.metric("Käufe bei automatischer Ausspielung", df[df.site.str.contains("artDetailApi")].shape[0])
+        st.metric(
+            "Käufe bei automatischer Ausspielung",
+            df[df.site.str.contains("artDetailApi")].shape[0],
+        )
