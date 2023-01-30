@@ -3,11 +3,6 @@ import boto3
 from boto3.dynamodb.conditions import Key, Attr
 import pandas as pd
 import datetime
-from PIL import Image
-
-man_img = Image.open("manual.jpeg")
-ai_img = Image.open("ai.jpeg")
-
 
 def check_password():
     """Returns `True` if the user had the correct password."""
@@ -80,13 +75,11 @@ if check_password():
     st.write("Zeitraum: ", start, " - ", end)
     col1, col2 = st.columns(2)
     with col1:
-        st.image(man_img, use_column_width="auto")
         st.metric(
             "Käufe bei manueller Ausspielung",
             df[df.site.str.contains("artDetailManual")].shape[0],
         )
     with col2:
-        st.image(ai_img, use_column_width="auto")
         st.metric(
             "Käufe bei automatischer Ausspielung",
             df[df.site.str.contains("artDetailApi")].shape[0],
